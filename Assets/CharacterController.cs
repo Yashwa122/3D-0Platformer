@@ -4,13 +4,19 @@ using UnityEngine;
 
 public class CharacterController : MonoBehaviour
 {
-    float maxSpeed = 3.0f;
+    public float maxSpeed = 3.0f;
     float rotation = 0.0f;
     float camRotaion = 1.0f;
+
     GameObject cam;
     float rotaionSpeed = 2.0f;
     float camRotaionSpeed = 1.5f;
     Rigidbody myRidgidbody;
+
+    bool isOnGround;
+    public GameObject groundChecker;
+    public LayerMask groundLayer;
+    public float JumpForce = 300.0f;
     
     // Start is called before the first frame update
     void Start()
@@ -22,9 +28,14 @@ public class CharacterController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.position = transform.position + (transform.right * Input.GetAxis("Horizontal") * maxSpeed);
+        isOnGround = Physics.CheckSphere(groundChecker.transform.position, 0.1f, groundLayer);
 
-        Vector3 newVelocity = transform.forward * Input.GetAxis("Vertical") * maxSpeed;
+        if (isOnGround == true && Input.GetKeyDown(KeyCode.Space))
+        {
+            myRidgidbody.AddForce(transform.up * JumpForce);
+        }
+        
+        Vector3 newVelocity = transform.forward * Input.GetAxis("Vertical") * maxSpeed + (transform.right * Input.GetAxis("Horizontal") * maxSpeed);
         myRidgidbody.velocity = new Vector3(newVelocity.x, myRidgidbody.velocity.y, newVelocity.z);
 
         rotation = rotation + Input.GetAxis("Mouse X") * rotaionSpeed;
