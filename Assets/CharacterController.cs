@@ -4,23 +4,33 @@ using UnityEngine;
 
 public class CharacterController : MonoBehaviour
 {
-    public float maxSpeed = 3.0f;
+    public float maxSpeed;
+    public float normalSpeed = 10.0f;
+    public float sprintSpeed = 20.0f;
+
     float rotation = 0.0f;
-    float camRotaion = 1.0f;
+    float camRotation = 1.0f;
 
     GameObject cam;
-    float rotaionSpeed = 2.0f;
-    float camRotaionSpeed = 1.5f;
+    float rotationSpeed = 2.0f;
+    float camRotationSpeed = 1.5f;
     Rigidbody myRidgidbody;
 
     bool isOnGround;
     public GameObject groundChecker;
     public LayerMask groundLayer;
     public float JumpForce = 300.0f;
+
+    public float maxSprint = 5.0f;
+    float sprintTimer;
     
     // Start is called before the first frame update
     void Start()
     {
+        Cursor.lockState = CursorLockMode.Locked;
+
+        sprintTimer = maxSprint;
+        
         cam = GameObject.Find("Main Camera");
         myRidgidbody = GetComponent<Rigidbody>();
     }
@@ -34,14 +44,29 @@ public class CharacterController : MonoBehaviour
         {
             myRidgidbody.AddForce(transform.up * JumpForce);
         }
+
+        if (Input.GetKey(KeyCode.LeftShift) && sprintTimer > 0.0f)
+        {
+            maxSpeed = sprintSpeed;
+            sprintTimer = sprintTimer - Time.deltaTime;
+        } else
+        {
+            maxSpeed = normalSpeed;
+            if (Input.GetKey(KeyCode.LeftShift) == false)
+            {
+                sprintTimer = sprintTimer + Time.deltaTime;
+            }
+        }
+
+        sprintTimer = Mathf.Clamp(sprintTimer, 0.0f, maxSpeed);
         
         Vector3 newVelocity = transform.forward * Input.GetAxis("Vertical") * maxSpeed + (transform.right * Input.GetAxis("Horizontal") * maxSpeed);
         myRidgidbody.velocity = new Vector3(newVelocity.x, myRidgidbody.velocity.y, newVelocity.z);
 
-        rotation = rotation + Input.GetAxis("Mouse X") * rotaionSpeed;
+        rotation = rotation + Input.GetAxis("Mouse X") * rotationSpeed;
         transform.rotation = Quaternion.Euler(new Vector3(0.0f, rotation, 0.0f));
 
-        camRotaion = camRotaion + Input.GetAxis("Mouse Y") * camRotaionSpeed;
-        cam.transform.localRotation = Quaternion.Euler(new Vector3(-camRotaion, 0.0f, 0.0f));
+        camRotation = camRotation + Input.GetAxis("Mouse Y") * camRotationSpeed;
+        cam.transform.localRotation = Quaternion.Euler(new Vector3(-camRotation, 0.0f, 0.0f));
     }
 }
