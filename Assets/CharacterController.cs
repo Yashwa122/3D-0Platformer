@@ -19,7 +19,7 @@ public class CharacterController : MonoBehaviour
     bool isOnGround;
     public GameObject groundChecker;
     public LayerMask groundLayer;
-    public float JumpForce = 300.0f;
+    public float jumpForce = 300.0f;
 
     public float maxSprint = 5.0f;
     float sprintTimer;
@@ -42,7 +42,7 @@ public class CharacterController : MonoBehaviour
 
         if (isOnGround == true && Input.GetKeyDown(KeyCode.Space))
         {
-            myRidgidbody.AddForce(transform.up * JumpForce);
+            myRidgidbody.AddForce(transform.up * jumpForce);
         }
 
         if (Input.GetKey(KeyCode.LeftShift) && sprintTimer > 0.0f)
@@ -67,6 +67,9 @@ public class CharacterController : MonoBehaviour
         transform.rotation = Quaternion.Euler(new Vector3(0.0f, rotation, 0.0f));
 
         camRotation = camRotation + Input.GetAxis("Mouse Y") * camRotationSpeed;
+
+        camRotation = Mathf.Clamp(camRotation, -40.0f, 40.0f);
+
         cam.transform.localRotation = Quaternion.Euler(new Vector3(-camRotation, 0.0f, 0.0f));
     }
 }
